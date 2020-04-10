@@ -14,6 +14,9 @@ std::filesystem::path get_config_file_path() {
 
 int main()
 {
+	bool has_publish{ false };
+	bool has_subscribe{ false };
+
 	auto config = get_config_file_path();
 
 	const auto input_file = cpptoml::parse_file(config.generic_string());
@@ -43,6 +46,8 @@ int main()
 
 		out << YAML::EndMap;
 		out << YAML::Newline;
+
+		has_publish = true;
 	}
 
 	// Get the subscribing topics
@@ -60,43 +65,86 @@ int main()
 
 		out << YAML::EndMap;
 		out << YAML::Newline;
+
+		has_subscribe = true;
 	}
 
-	for (auto&& topic : *publish_topics)
-	{
-		out << YAML::BeginMap;
+	if (has_publish) {
+		for (auto&& topic : *publish_topics)
+		{
+			out << YAML::BeginMap;
 
-		out << YAML::Key << topic;
-		out << YAML::Value;
-		out << YAML::BeginSeq;
-		auto data_list = input_file->get_table_array(topic);
-		if (data_list) {
-			// Loop through all the tables
-			for (const auto& table : *data_list) {
-				out << YAML::BeginMap;
-				out << YAML::Key << table->get_as<std::string>("name").value_or("");
-				out << YAML::Value;
+			out << YAML::Key << topic;
+			out << YAML::Value;
+			out << YAML::BeginSeq;
+			auto data_list = input_file->get_table_array(topic);
+			if (data_list) {
+				// Loop through all the tables
+				for (const auto& table : *data_list) {
+					out << YAML::BeginMap;
+					out << YAML::Key << table->get_as<std::string>("name").value_or("");
+					out << YAML::Value;
 
-				out << YAML::BeginMap;
-				out << YAML::Key << "dataref" << YAML::Value << YAML::DoubleQuoted << table->get_as<std::string>("string").value_or("");
-				out << YAML::Key << "type" << YAML::Value << YAML::DoubleQuoted << table->get_as<std::string>("type").value_or("");
+					out << YAML::BeginMap;
+					out << YAML::Key << "dataref" << YAML::Value << YAML::DoubleQuoted << table->get_as<std::string>("string").value_or("");
+					out << YAML::Key << "type" << YAML::Value << YAML::DoubleQuoted << table->get_as<std::string>("type").value_or("");
 
-				auto start = table->get_as<int>("start_index").value_or(-1);
-				if (start != -1) {
-					out << YAML::Key << "start" << YAML::Value << YAML::DoubleQuoted << start;
+					auto start = table->get_as<int>("start_index").value_or(-1);
+					if (start != -1) {
+						out << YAML::Key << "start" << YAML::Value << YAML::DoubleQuoted << start;
+					}
+
+					auto num = table->get_as<int>("num_value").value_or(-1);
+					if (num != -1) {
+						out << YAML::Key << "end" << YAML::Value << YAML::DoubleQuoted << start;
+					}
+					out << YAML::EndMap;
+					out << YAML::EndMap;
+					out << YAML::Newline;
 				}
-
-				auto num = table->get_as<int>("num_value").value_or(-1);
-				if (num != -1) {
-					out << YAML::Key << "end" << YAML::Value << YAML::DoubleQuoted << start;
-				}
-				out << YAML::EndMap;
-				out << YAML::EndMap;
-				out << YAML::Newline;
 			}
+			out << YAML::EndSeq;
+			out << YAML::Newline;
 		}
-		out << YAML::EndSeq;
-		out << YAML::Newline;
+	}
+	
+	if (has_subscribe) {
+		for (auto&& topic : *subscribe_topics)
+		{
+			out << YAML::BeginMap;
+
+			out << YAML::Key << topic;
+			out << YAML::Value;
+			out << YAML::BeginSeq;
+			auto data_list = input_file->get_table_array(topic);
+			if (data_list) {
+				// Loop through all the tables
+				for (const auto& table : *data_list) {
+					out << YAML::BeginMap;
+					out << YAML::Key << table->get_as<std::string>("name").value_or("");
+					out << YAML::Value;
+
+					out << YAML::BeginMap;
+					out << YAML::Key << "dataref" << YAML::Value << YAML::DoubleQuoted << table->get_as<std::string>("string").value_or("");
+					out << YAML::Key << "type" << YAML::Value << YAML::DoubleQuoted << table->get_as<std::string>("type").value_or("");
+
+					auto start = table->get_as<int>("start_index").value_or(-1);
+					if (start != -1) {
+						out << YAML::Key << "start" << YAML::Value << YAML::DoubleQuoted << start;
+					}
+
+					auto num = table->get_as<int>("num_value").value_or(-1);
+					if (num != -1) {
+						out << YAML::Key << "end" << YAML::Value << YAML::DoubleQuoted << start;
+					}
+					out << YAML::EndMap;
+					out << YAML::EndMap;
+					out << YAML::Newline;
+				}
+			}
+			out << YAML::EndSeq;
+			out << YAML::Newline;
+		}
 	}
 
 	out << YAML::EndDoc;
