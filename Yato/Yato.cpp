@@ -12,6 +12,11 @@ std::filesystem::path get_config_file_path() {
 	return std::filesystem::path{};
 }
 
+void close_file(std::ofstream& fp) {
+	fmt::print("Closing file...\n");
+	fp.close();
+}
+
 int main()
 {
 	bool has_publish{ false };
@@ -153,10 +158,11 @@ int main()
 
 	fmt::print("{}\n", out.c_str());
 
-	std::ofstream outfile;
 	auto out_file = fmt::format("{}.yaml", config.stem().generic_string());
+	std::ofstream outfile;
 	outfile.open(out_file, std::ios_base::out);
 	outfile << out.c_str();
+	outfile.close();
 
 	std::getchar();
 	return 0;
