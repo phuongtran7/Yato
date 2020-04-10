@@ -12,11 +12,6 @@ std::filesystem::path get_config_file_path() {
 	return std::filesystem::path{};
 }
 
-void close_file(std::ofstream& fp) {
-	fmt::print("Closing file...\n");
-	fp.close();
-}
-
 int main()
 {
 	bool has_publish{ false };
