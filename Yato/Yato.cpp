@@ -24,7 +24,7 @@ int main()
 
 	out << YAML::BeginMap;
 	out << YAML::Key << "Address";
-	out << YAML::Value << address;
+	out << YAML::Value << YAML::DoubleQuoted << address ;
 	out << YAML::EndMap;
 
 	// Get the publishing topics
@@ -37,7 +37,7 @@ int main()
 		out << YAML::Value;
 		out << YAML::BeginSeq;
 		for (auto&& name : *publish_topics) {
-			out << name;
+			out << YAML::DoubleQuoted << name;
 		}
 		out << YAML::EndSeq;
 
@@ -54,7 +54,7 @@ int main()
 		out << YAML::Value;
 		out << YAML::BeginSeq;
 		for (auto&& name : *subscribe_topics) {
-			out << name;
+			out << YAML::DoubleQuoted << name;
 		}
 		out << YAML::EndSeq;
 
@@ -77,17 +77,17 @@ int main()
 				out << YAML::Value;
 
 				out << YAML::BeginMap;
-				out << YAML::Key << "dataref" << YAML::Value << table->get_as<std::string>("string").value_or("");
-				out << YAML::Key << "type" << YAML::Value << table->get_as<std::string>("type").value_or("");
+				out << YAML::Key << "dataref" << YAML::Value << YAML::DoubleQuoted << table->get_as<std::string>("string").value_or("");
+				out << YAML::Key << "type" << YAML::Value << YAML::DoubleQuoted << table->get_as<std::string>("type").value_or("");
 
 				auto start = table->get_as<int>("start_index").value_or(-1);
 				if (start != -1) {
-					out << YAML::Key << "start" << YAML::Value << start;
+					out << YAML::Key << "start" << YAML::Value << YAML::DoubleQuoted << start;
 				}
 
 				auto num = table->get_as<int>("num_value").value_or(-1);
 				if (num != -1) {
-					out << YAML::Key << "end" << YAML::Value << start;
+					out << YAML::Key << "end" << YAML::Value << YAML::DoubleQuoted << start;
 				}
 				out << YAML::EndMap;
 				out << YAML::EndMap;
