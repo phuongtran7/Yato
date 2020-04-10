@@ -14,14 +14,13 @@ std::filesystem::path get_config_file_path() {
 
 int main()
 {
-	YAML::Emitter out;
-
 	auto config = get_config_file_path();
 
 	const auto input_file = cpptoml::parse_file(config.generic_string());
 	auto address = input_file->get_as<std::string>("address").value_or("tcp://192.168.72.249:1883");
 
-	out << YAML::BeginDoc;
+	YAML::Emitter out;
+	//out << YAML::BeginDoc;
 
 	out << YAML::BeginMap;
 	out << YAML::Key << "Address";
@@ -32,6 +31,7 @@ int main()
 	auto publish_topics = input_file->get_array_of<std::string>("publish_topic");
 	if (publish_topics) {
 		out << YAML::BeginMap;
+
 		out << YAML::Key << "Publish Topic";
 
 		out << YAML::Value;
@@ -40,6 +40,7 @@ int main()
 			out << name;
 		}
 		out << YAML::EndSeq;
+
 		out << YAML::EndMap;
 	}
 
@@ -47,6 +48,7 @@ int main()
 	auto subscribe_topics = input_file->get_array_of<std::string>("subscribe_topic");
 	if (subscribe_topics) {
 		out << YAML::BeginMap;
+
 		out << YAML::Key << "Subscirbe Topic";
 
 		out << YAML::Value;
@@ -55,18 +57,19 @@ int main()
 			out << name;
 		}
 		out << YAML::EndSeq;
+
 		out << YAML::EndMap;
 	}
 
-	for (const auto& topic : *publish_topics)
+	for (auto&& topic : *publish_topics)
 	{
 		out << YAML::BeginMap;
 		out << YAML::Key << topic;
 		out << YAML::Value;
 
 		out << YAML::BeginSeq;
-		const auto data_list = input_file->get_table_array(topic);
-		if (data_list != nullptr) {
+		auto data_list = input_file->get_table_array(topic);
+		if (data_list) {
 			// Loop through all the tables
 			for (const auto& table : *data_list) {
 				out << YAML::BeginMap;
@@ -93,9 +96,9 @@ int main()
 		out << YAML::EndSeq;
 	}
 
-	out << YAML::EndDoc;
+	//out << YAML::EndDoc;
 
-	fmt::print("Output:\n\n {}\n", out.c_str());
+	fmt::print("{}\n", out.c_str());
 
 	std::ofstream outfile;
 	auto out_file = fmt::format("{}.yaml", config.stem().generic_string());
