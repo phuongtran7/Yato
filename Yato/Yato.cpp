@@ -104,6 +104,7 @@ int main()
 				}
 			}
 			out << YAML::EndSeq;
+			out << YAML::EndMap;
 			out << YAML::Newline;
 		}
 	}
@@ -143,6 +144,7 @@ int main()
 				}
 			}
 			out << YAML::EndSeq;
+			out << YAML::EndMap;
 			out << YAML::Newline;
 		}
 	}
