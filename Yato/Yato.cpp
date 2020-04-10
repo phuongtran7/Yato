@@ -12,6 +12,68 @@ std::filesystem::path get_config_file_path() {
 	return std::filesystem::path{};
 }
 
+void write_topic(YAML::Emitter& emitter, cpptoml::option<std::vector<std::string>>& topic, const std::string& name) {
+	emitter << YAML::BeginMap;
+
+	emitter << YAML::Key << name;
+	emitter << YAML::Value;
+	emitter << YAML::BeginSeq;
+	for (auto&& name : *topic) {
+		emitter << YAML::DoubleQuoted << name;
+	}
+	emitter << YAML::EndSeq;
+
+	emitter << YAML::EndMap;
+	emitter << YAML::Newline;
+}
+
+void write_to_file(YAML::Emitter& emitter, std::string_view file_name) {
+	std::ofstream outfile;
+	outfile.open(file_name, std::ios_base::out);
+	outfile << emitter.c_str();
+	outfile.close();
+}
+
+void write_dataref_in_topic(YAML::Emitter& emitter, cpptoml::option<std::vector<std::string>>& topic, std::shared_ptr<cpptoml::table> input_file) {
+	for (auto&& topic : *topic)
+	{
+		emitter << YAML::BeginMap;
+
+		emitter << YAML::Key << topic;
+		emitter << YAML::Value;
+		emitter << YAML::BeginSeq;
+		auto data_list = input_file->get_table_array(topic);
+		if (data_list) {
+			// Loop through all the tables
+			for (const auto& table : *data_list) {
+				emitter << YAML::BeginMap;
+				emitter << YAML::Key << YAML::DoubleQuoted << table->get_as<std::string>("name").value_or("");
+				emitter << YAML::Value;
+
+				emitter << YAML::BeginMap;
+				emitter << YAML::Key << "dataref" << YAML::Value << YAML::DoubleQuoted << table->get_as<std::string>("string").value_or("");
+				emitter << YAML::Key << "type" << YAML::Value << YAML::DoubleQuoted << table->get_as<std::string>("type").value_or("");
+
+				auto start = table->get_as<int>("start_index").value_or(-1);
+				if (start != -1) {
+					emitter << YAML::Key << "start" << YAML::Value << YAML::DoubleQuoted << start;
+				}
+
+				auto num = table->get_as<int>("num_value").value_or(-1);
+				if (num != -1) {
+					emitter << YAML::Key << "end" << YAML::Value << YAML::DoubleQuoted << start;
+				}
+				emitter << YAML::EndMap;
+				emitter << YAML::EndMap;
+				emitter << YAML::Newline;
+			}
+		}
+		emitter << YAML::EndSeq;
+		emitter << YAML::EndMap;
+		emitter << YAML::Newline;
+	}
+}
+
 int main()
 {
 	bool has_publish{ false };
@@ -34,119 +96,23 @@ int main()
 	// Get the publishing topics
 	auto publish_topics = input_file->get_array_of<std::string>("publish_topic");
 	if (publish_topics) {
-		out << YAML::BeginMap;
-
-		out << YAML::Key << "Publish Topic";
-		out << YAML::Value;
-		out << YAML::BeginSeq;
-		for (auto&& name : *publish_topics) {
-			out << YAML::DoubleQuoted << name;
-		}
-		out << YAML::EndSeq;
-
-		out << YAML::EndMap;
-		out << YAML::Newline;
-
+		write_topic(out, publish_topics, "Publish Topic");
 		has_publish = true;
 	}
 
 	// Get the subscribing topics
 	auto subscribe_topics = input_file->get_array_of<std::string>("subscribe_topic");
 	if (subscribe_topics) {
-		out << YAML::BeginMap;
-
-		out << YAML::Key << "Subscirbe Topic";
-		out << YAML::Value;
-		out << YAML::BeginSeq;
-		for (auto&& name : *subscribe_topics) {
-			out << YAML::DoubleQuoted << name;
-		}
-		out << YAML::EndSeq;
-
-		out << YAML::EndMap;
-		out << YAML::Newline;
-
+		write_topic(out, publish_topics, "Subscirbe Topic");
 		has_subscribe = true;
 	}
 
 	if (has_publish) {
-		for (auto&& topic : *publish_topics)
-		{
-			out << YAML::BeginMap;
-
-			out << YAML::Key << topic;
-			out << YAML::Value;
-			out << YAML::BeginSeq;
-			auto data_list = input_file->get_table_array(topic);
-			if (data_list) {
-				// Loop through all the tables
-				for (const auto& table : *data_list) {
-					out << YAML::BeginMap;
-					out << YAML::Key << table->get_as<std::string>("name").value_or("");
-					out << YAML::Value;
-
-					out << YAML::BeginMap;
-					out << YAML::Key << "dataref" << YAML::Value << YAML::DoubleQuoted << table->get_as<std::string>("string").value_or("");
-					out << YAML::Key << "type" << YAML::Value << YAML::DoubleQuoted << table->get_as<std::string>("type").value_or("");
-
-					auto start = table->get_as<int>("start_index").value_or(-1);
-					if (start != -1) {
-						out << YAML::Key << "start" << YAML::Value << YAML::DoubleQuoted << start;
-					}
-
-					auto num = table->get_as<int>("num_value").value_or(-1);
-					if (num != -1) {
-						out << YAML::Key << "end" << YAML::Value << YAML::DoubleQuoted << start;
-					}
-					out << YAML::EndMap;
-					out << YAML::EndMap;
-					out << YAML::Newline;
-				}
-			}
-			out << YAML::EndSeq;
-			out << YAML::EndMap;
-			out << YAML::Newline;
-		}
+		write_dataref_in_topic(out, publish_topics, input_file);
 	}
 	
 	if (has_subscribe) {
-		for (auto&& topic : *subscribe_topics)
-		{
-			out << YAML::BeginMap;
-
-			out << YAML::Key << topic;
-			out << YAML::Value;
-			out << YAML::BeginSeq;
-			auto data_list = input_file->get_table_array(topic);
-			if (data_list) {
-				// Loop through all the tables
-				for (const auto& table : *data_list) {
-					out << YAML::BeginMap;
-					out << YAML::Key << table->get_as<std::string>("name").value_or("");
-					out << YAML::Value;
-
-					out << YAML::BeginMap;
-					out << YAML::Key << "dataref" << YAML::Value << YAML::DoubleQuoted << table->get_as<std::string>("string").value_or("");
-					out << YAML::Key << "type" << YAML::Value << YAML::DoubleQuoted << table->get_as<std::string>("type").value_or("");
-
-					auto start = table->get_as<int>("start_index").value_or(-1);
-					if (start != -1) {
-						out << YAML::Key << "start" << YAML::Value << YAML::DoubleQuoted << start;
-					}
-
-					auto num = table->get_as<int>("num_value").value_or(-1);
-					if (num != -1) {
-						out << YAML::Key << "end" << YAML::Value << YAML::DoubleQuoted << start;
-					}
-					out << YAML::EndMap;
-					out << YAML::EndMap;
-					out << YAML::Newline;
-				}
-			}
-			out << YAML::EndSeq;
-			out << YAML::EndMap;
-			out << YAML::Newline;
-		}
+		write_dataref_in_topic(out, subscribe_topics, input_file);
 	}
 
 	out << YAML::EndDoc;
@@ -154,10 +120,7 @@ int main()
 	fmt::print("{}\n", out.c_str());
 
 	auto out_file = fmt::format("{}.yaml", config.stem().generic_string());
-	std::ofstream outfile;
-	outfile.open(out_file, std::ios_base::out);
-	outfile << out.c_str();
-	outfile.close();
+	write_to_file(out, out_file);
 
 	std::getchar();
 	return 0;
