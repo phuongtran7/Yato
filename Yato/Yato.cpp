@@ -20,7 +20,7 @@ int main()
 	auto address = input_file->get_as<std::string>("address").value_or("tcp://192.168.72.249:1883");
 
 	YAML::Emitter out;
-	//out << YAML::BeginDoc;
+	out << YAML::BeginDoc;
 
 	out << YAML::BeginMap;
 	out << YAML::Key << "Address";
@@ -34,7 +34,6 @@ int main()
 		out << YAML::BeginMap;
 
 		out << YAML::Key << "Publish Topic";
-
 		out << YAML::Value;
 		out << YAML::BeginSeq;
 		for (auto&& name : *publish_topics) {
@@ -43,7 +42,6 @@ int main()
 		out << YAML::EndSeq;
 
 		out << YAML::EndMap;
-
 		out << YAML::Newline;
 	}
 
@@ -53,7 +51,6 @@ int main()
 		out << YAML::BeginMap;
 
 		out << YAML::Key << "Subscirbe Topic";
-
 		out << YAML::Value;
 		out << YAML::BeginSeq;
 		for (auto&& name : *subscribe_topics) {
@@ -62,16 +59,15 @@ int main()
 		out << YAML::EndSeq;
 
 		out << YAML::EndMap;
-
 		out << YAML::Newline;
 	}
 
 	for (auto&& topic : *publish_topics)
 	{
 		out << YAML::BeginMap;
+
 		out << YAML::Key << topic;
 		out << YAML::Value;
-
 		out << YAML::BeginSeq;
 		auto data_list = input_file->get_table_array(topic);
 		if (data_list) {
@@ -103,7 +99,7 @@ int main()
 		out << YAML::Newline;
 	}
 
-	//out << YAML::EndDoc;
+	out << YAML::EndDoc;
 
 	fmt::print("{}\n", out.c_str());
 
