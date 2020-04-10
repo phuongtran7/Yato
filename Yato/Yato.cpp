@@ -26,6 +26,7 @@ int main()
 	out << YAML::Key << "Address";
 	out << YAML::Value << YAML::DoubleQuoted << address ;
 	out << YAML::EndMap;
+	out << YAML::Newline;
 
 	// Get the publishing topics
 	auto publish_topics = input_file->get_array_of<std::string>("publish_topic");
@@ -42,6 +43,8 @@ int main()
 		out << YAML::EndSeq;
 
 		out << YAML::EndMap;
+
+		out << YAML::Newline;
 	}
 
 	// Get the subscribing topics
@@ -59,6 +62,8 @@ int main()
 		out << YAML::EndSeq;
 
 		out << YAML::EndMap;
+
+		out << YAML::Newline;
 	}
 
 	for (auto&& topic : *publish_topics)
@@ -91,9 +96,11 @@ int main()
 				}
 				out << YAML::EndMap;
 				out << YAML::EndMap;
+				out << YAML::Newline;
 			}
 		}
 		out << YAML::EndSeq;
+		out << YAML::Newline;
 	}
 
 	//out << YAML::EndDoc;
