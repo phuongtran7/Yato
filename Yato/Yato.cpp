@@ -27,10 +27,10 @@ void write_topic(YAML::Emitter& emitter, cpptoml::option<std::vector<std::string
 	emitter << YAML::Newline;
 }
 
-void write_to_file(YAML::Emitter& emitter, std::string_view file_name) {
+void write_to_file(std::string_view output , std::string_view file_name) {
 	std::ofstream outfile;
 	outfile.open(file_name, std::ios_base::out);
-	outfile << emitter.c_str();
+	outfile << output;
 	outfile.close();
 }
 
@@ -120,7 +120,7 @@ int main()
 	fmt::print("{}\n", out.c_str());
 
 	auto out_file = fmt::format("{}.yaml", config.stem().generic_string());
-	write_to_file(out, out_file);
+	write_to_file(out.c_str(), out_file);
 
 	std::getchar();
 	return 0;
