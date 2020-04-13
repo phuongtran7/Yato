@@ -61,7 +61,7 @@ void write_dataref_in_topic(YAML::Emitter& emitter, cpptoml::option<std::vector<
 
 				auto num = table->get_as<int>("num_value").value_or(-1);
 				if (num != -1) {
-					emitter << YAML::Key << "end" << YAML::Value << YAML::DoubleQuoted << num;
+					emitter << YAML::Key << "num_value" << YAML::Value << YAML::DoubleQuoted << num;
 				}
 				emitter << YAML::EndMap;
 				emitter << YAML::EndMap;
