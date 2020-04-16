@@ -3,7 +3,7 @@
 This is a simple `TOML` to `YAML` converter. Currently, only support converting [Ditto](https://github.com/phuongtran7/Ditto_ActiveMQ)'s configuration file into `YAML` format. This is done due to the verbosity of current Ditto's `TOML` config. The more datarefs the more redundant text there is.
 
 ## Dependencies
-1. Stand-alone ASIO ([https://think-async.com/Asio/AsioStandalone.html](https://think-async.com/Asio/AsioStandalone.html)).
+1. yaml-cpp [https://github.com/jbeder/yaml-cpp](https://github.com/jbeder/yaml-cpp)
 2. {fmt} ([https://github.com/fmtlib/fmt](https://github.com/fmtlib/fmt)).
 3. FlatBuffers ([https://github.com/google/flatbuffers](https://github.com/google/flatbuffers))
 
