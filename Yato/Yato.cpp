@@ -117,7 +117,7 @@ int main()
 
 	out << YAML::EndDoc;
 
-	fmt::print("{}\n", out.c_str());
+	//fmt::print("{}\n", out.c_str());
 
 	auto out_file = fmt::format("{}.yaml", config.stem().generic_string());
 	write_to_file(out.c_str(), out_file);
