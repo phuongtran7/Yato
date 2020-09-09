@@ -5,7 +5,7 @@ This is a simple `TOML` to `YAML` converter. Currently, only support converting 
 ## Dependencies
 1. yaml-cpp [https://github.com/jbeder/yaml-cpp](https://github.com/jbeder/yaml-cpp)
 2. {fmt} ([https://github.com/fmtlib/fmt](https://github.com/fmtlib/fmt)).
-3. FlatBuffers ([https://github.com/google/flatbuffers](https://github.com/google/flatbuffers))
+3. cpptoml ([https://github.com/skystrife/cpptoml](https://github.com/skystrife/cpptoml))
 
 ## Building
 1. Install all dependencies with Microsoft's [vcpkg](https://github.com/Microsoft/vcpkg).
